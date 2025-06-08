@@ -5,16 +5,15 @@ import { useState } from "react";
 import { useDebounce } from "use-debounce";
 import SearchBox from "../SearchBox/SearchBox";
 import NoteList from "../NoteList/NoteList";
-import ReactPaginate from "react-paginate";
 import Pagination from "../Pagination/Pagination";
 
-function App() {
+export default function App() {
   const [page, setPage] = useState<number>(1);
-  const [search, setSearch] = useState<string>(" ");
+  const [search, setSearch] = useState<string>("");
   const [debouncedSearch] = useDebounce(search, 1000);
-  const { data, isLoading, isError, isSuccess } = useQuery({
+  const { data, isSuccess } = useQuery({
     queryKey: ["note", page, debouncedSearch],
-    queryFn: () => fetchNotes(page, debouncedSearch),
+    queryFn: () => fetchNotes(debouncedSearch, page),
     placeholderData: keepPreviousData,
   });
 
@@ -29,16 +28,14 @@ function App() {
     <>
       <div className={css.app}>
         <header className={css.toolbar}>
-          <SearchBox onSearch={handleSearch} />
+          <SearchBox onSearch={handleSearch} value={search} />
           {isSuccess && totalPages > 1 && (
             <Pagination totalPages={totalPages} page={page} onPage={setPage} />
           )}
           <button className={css.button}>Create note +</button>
         </header>
-        {isSuccess && <NoteList notes={data.notes} />}
+        {isSuccess && data.notes.length > 0 && <NoteList notes={data.notes} />}
       </div>
     </>
   );
 }
-
-export default App;

@@ -1,26 +1,37 @@
 import axios from "axios";
 import { type Note } from "../types/note";
 
-const config = {
-  headers: {
-    Authorization: `Bearer ${import.meta.env.VITE_NOTEHUB_TOKEN}`,
-    accept: "application/json",
-  },
-};
-
 interface FetchNotesProps {
   notes: Note[];
   totalPages: number;
 }
 
+interface paramsProps {
+  page: number;
+  perPage: number;
+  search?: string;
+}
+
+axios.defaults.baseURL = "https://notehub-public.goit.study/api";
+
 export async function fetchNotes(
-  page: number,
-  search: string
+  search: string,
+  page: number
 ): Promise<FetchNotesProps> {
-  const res = await axios.get<FetchNotesProps>(
-    `https://notehub-public.goit.study/api/notes?search=${search}&page=${page}&perPage=12`,
-    config
-  );
+  const params: paramsProps = {
+    page,
+    perPage: 12,
+  };
+  if (search.trim()) {
+    params.search = search;
+  }
+  const res = await axios.get<FetchNotesProps>(`/notes`, {
+    params,
+    headers: {
+      Authorization: `Bearer ${import.meta.env.VITE_NOTEHUB_TOKEN}`,
+      accept: "application/json",
+    },
+  });
   return res.data;
 }
 
