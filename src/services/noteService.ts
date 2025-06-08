@@ -4,6 +4,7 @@ import { type Note } from "../types/note";
 const config = {
   headers: {
     Authorization: `Bearer ${import.meta.env.VITE_NOTEHUB_TOKEN}`,
+    accept: "application/json",
   },
 };
 
@@ -12,9 +13,12 @@ interface FetchNotesProps {
   totalPages: number;
 }
 
-export async function fetchNotes(): Promise<FetchNotesProps> {
+export async function fetchNotes(
+  page: number,
+  search: string
+): Promise<FetchNotesProps> {
   const res = await axios.get<FetchNotesProps>(
-    `https://notehub-public.goit.study/api/notes?page=1&perPage=12`,
+    `https://notehub-public.goit.study/api/notes?search=${search}&page=${page}&perPage=12`,
     config
   );
   console.log(res.data);
