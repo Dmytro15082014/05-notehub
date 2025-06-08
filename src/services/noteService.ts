@@ -21,8 +21,6 @@ export async function fetchNotes(
     `https://notehub-public.goit.study/api/notes?search=${search}&page=${page}&perPage=12`,
     config
   );
-  console.log(res.data);
-
   return res.data;
 }
 
