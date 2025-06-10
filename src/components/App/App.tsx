@@ -1,23 +1,38 @@
 import css from "./App.module.css";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { fetchNotes } from "../../services/noteService";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
 import SearchBox from "../SearchBox/SearchBox";
 import NoteList from "../NoteList/NoteList";
 import Pagination from "../Pagination/Pagination";
 import NoteModal from "../NoteModal/NoteModal";
+import Loader from "../Loader/Loader";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function App() {
   const [page, setPage] = useState<number>(1);
   const [search, setSearch] = useState<string>("");
   const [debouncedSearch] = useDebounce(search, 300);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const { data, isSuccess } = useQuery({
+  const { data, isSuccess, isLoading, error, isError } = useQuery({
     queryKey: ["note", debouncedSearch, page],
     queryFn: () => fetchNotes(debouncedSearch, page),
     placeholderData: keepPreviousData,
   });
+
+  useEffect(() => {
+    if (isError && error) {
+      toast.error(`Something went wrong.. try again later`, {
+        id: "fetch-error",
+      });
+    }
+    if (data?.notes.length === 0) {
+      toast.error(`Search not found`, {
+        id: "fetch-error",
+      });
+    }
+  }, [data?.notes.length, isError, error]);
 
   const handleSearch = (newSearch: string) => {
     setSearch(newSearch);
@@ -46,9 +61,11 @@ export default function App() {
             Create note +
           </button>
         </header>
+        {isLoading && <Loader />}
         {isSuccess && data.notes.length > 0 && <NoteList notes={data.notes} />}
       </div>
       {isModalOpen && <NoteModal onClose={closeForm} />}
+      {<Toaster />}
     </>
   );
 }

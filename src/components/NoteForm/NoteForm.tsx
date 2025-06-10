@@ -2,7 +2,7 @@ import { useEffect, useId } from "react";
 import css from "./NoteForm.module.css";
 import { Formik, Form, Field, type FormikHelpers, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import type { Note } from "../../types/note";
+import type { NoteInput } from "../../types/note";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createNote } from "../../services/noteService";
 
@@ -10,7 +10,7 @@ interface NoteForm {
   cancel: () => void;
 }
 
-const initValues: Note = {
+const initValues: NoteInput = {
   title: "",
   content: "",
   tag: "Todo",
@@ -34,7 +34,7 @@ export default function NoteForm({ cancel }: NoteForm) {
   const fieldId = useId();
   const queryClient = useQueryClient();
   const { mutate, isPending } = useMutation({
-    mutationFn: (newNote: Note) => createNote(newNote),
+    mutationFn: (newNote: NoteInput) => createNote(newNote),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["note"] });
     },
@@ -59,7 +59,10 @@ export default function NoteForm({ cancel }: NoteForm) {
     if (e.target === e.currentTarget) cancel();
   };
 
-  const noteFormSubmit = (values: Note, actions: FormikHelpers<Note>) => {
+  const noteFormSubmit = (
+    values: NoteInput,
+    actions: FormikHelpers<NoteInput>
+  ) => {
     mutate(values);
     actions.resetForm();
     cancel();

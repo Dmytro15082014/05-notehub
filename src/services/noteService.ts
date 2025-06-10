@@ -1,5 +1,5 @@
 import axios from "axios";
-import { type Note } from "../types/note";
+import { type Note, type NoteInput } from "../types/note";
 
 interface FetchNotesProps {
   notes: Note[];
@@ -37,14 +37,14 @@ export async function fetchNotes(
   return res.data;
 }
 
-export async function createNote(noteData: Note) {
+export async function createNote(noteData: NoteInput) {
   const res = await axios.post<FetchNotesProps>("/notes", noteData, {
     headers: headersToken,
   });
   return res.data;
 }
 
-export async function deleteNote(note: number | undefined) {
+export async function deleteNote(note: string) {
   const res = await axios.delete(`/notes/${note}`, { headers: headersToken });
   return res.data;
 }
