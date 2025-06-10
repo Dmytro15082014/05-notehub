@@ -14,6 +14,11 @@ interface paramsProps {
 
 axios.defaults.baseURL = "https://notehub-public.goit.study/api";
 
+const headersToken = {
+  Authorization: `Bearer ${import.meta.env.VITE_NOTEHUB_TOKEN}`,
+  accept: "application/json",
+};
+
 export async function fetchNotes(
   search: string,
   page: number
@@ -27,16 +32,19 @@ export async function fetchNotes(
   }
   const res = await axios.get<FetchNotesProps>(`/notes`, {
     params,
-    headers: {
-      Authorization: `Bearer ${import.meta.env.VITE_NOTEHUB_TOKEN}`,
-      accept: "application/json",
-    },
+    headers: headersToken,
   });
   return res.data;
 }
 
-// Типізуйте їх параметри, результат, який вони повертають, та відповідь від Axios. У вас мають бути наступні функції:
+export async function createNote(noteData: Note) {
+  const res = await axios.post<FetchNotesProps>("/notes", noteData, {
+    headers: headersToken,
+  });
+  return res.data;
+}
 
-// fetchNotes : має виконувати запит для отримання колекції нотатків із сервера. Повинна підтримувати пагінацію (через параметр сторінки) та фільтрацію за ключовим словом (пошук);
-// createNote: має виконувати запит для створення нової нотатки на сервері. Приймає вміст нової нотатки та повертає створену нотатку у відповіді;
-// deleteNote: має виконувати запит для видалення нотатки за заданим ідентифікатором. Приймає ID нотатки та повертає інформацію про видалену нотатку у відповіді.
+export async function deleteNote(note: number | undefined) {
+  const res = await axios.delete(`/notes/${note}`, { headers: headersToken });
+  return res.data;
+}

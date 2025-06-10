@@ -6,13 +6,15 @@ import { useDebounce } from "use-debounce";
 import SearchBox from "../SearchBox/SearchBox";
 import NoteList from "../NoteList/NoteList";
 import Pagination from "../Pagination/Pagination";
+import NoteModal from "../NoteModal/NoteModal";
 
 export default function App() {
   const [page, setPage] = useState<number>(1);
   const [search, setSearch] = useState<string>("");
-  const [debouncedSearch] = useDebounce(search, 1000);
+  const [debouncedSearch] = useDebounce(search, 300);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { data, isSuccess } = useQuery({
-    queryKey: ["note", page, debouncedSearch],
+    queryKey: ["note", debouncedSearch, page],
     queryFn: () => fetchNotes(debouncedSearch, page),
     placeholderData: keepPreviousData,
   });
@@ -24,6 +26,14 @@ export default function App() {
 
   const totalPages = data?.totalPages ?? 0;
 
+  const openForm = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeForm = () => {
+    setIsModalOpen(false);
+  };
+
   return (
     <>
       <div className={css.app}>
@@ -32,10 +42,13 @@ export default function App() {
           {isSuccess && totalPages > 1 && (
             <Pagination totalPages={totalPages} page={page} onPage={setPage} />
           )}
-          <button className={css.button}>Create note +</button>
+          <button className={css.button} onClick={openForm}>
+            Create note +
+          </button>
         </header>
         {isSuccess && data.notes.length > 0 && <NoteList notes={data.notes} />}
       </div>
+      {isModalOpen && <NoteModal onClose={closeForm} />}
     </>
   );
 }
