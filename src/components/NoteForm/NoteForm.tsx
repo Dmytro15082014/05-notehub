@@ -32,6 +32,7 @@ const SchemaNoteOrder = Yup.object().shape({
 
 export default function NoteForm({ cancel }: NoteForm) {
   const fieldId = useId();
+
   const queryClient = useQueryClient();
   const { mutate, isPending } = useMutation({
     mutationFn: (newNote: NoteInput) => createNote(newNote),
