@@ -16,7 +16,7 @@ axios.defaults.baseURL = "https://notehub-public.goit.study/api";
 
 const headersToken = {
   Authorization: `Bearer ${import.meta.env.VITE_NOTEHUB_TOKEN}`,
-  accept: "application/json",
+  Accept: "application/json",
 };
 
 export async function fetchNotes(
@@ -37,14 +37,16 @@ export async function fetchNotes(
   return res.data;
 }
 
-export async function createNote(noteData: NoteInput) {
-  const res = await axios.post<FetchNotesProps>("/notes", noteData, {
+export async function createNote(noteData: NoteInput): Promise<NoteInput> {
+  const res = await axios.post<NoteInput>("/notes", noteData, {
     headers: headersToken,
   });
   return res.data;
 }
 
-export async function deleteNote(note: string) {
-  const res = await axios.delete(`/notes/${note}`, { headers: headersToken });
+export async function deleteNote(noteId: number): Promise<Note> {
+  const res = await axios.delete<Note>(`/notes/${noteId}`, {
+    headers: headersToken,
+  });
   return res.data;
 }

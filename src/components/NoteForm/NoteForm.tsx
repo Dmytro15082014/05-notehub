@@ -1,12 +1,13 @@
-import { useEffect, useId } from "react";
+import { useId } from "react";
 import css from "./NoteForm.module.css";
 import { Formik, Form, Field, type FormikHelpers, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import type { NoteInput } from "../../types/note";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createNote } from "../../services/noteService";
+import toast from "react-hot-toast";
 
-interface NoteForm {
+interface NoteFormProps {
   cancel: () => void;
 }
 
@@ -21,16 +22,14 @@ const SchemaNoteOrder = Yup.object().shape({
     .min(3, "Title must be at least 3 characters")
     .max(50, "Title is too long")
     .required("Title is required"),
-  content: Yup.string()
-    .max(500, "Content is too long")
-    .required("Content is required"),
+  content: Yup.string().max(500, "Content is too long"),
   tag: Yup.string().oneOf(
     ["Todo", "Work", "Personal", "Meeting", "Shopping"],
     "Invalid tag"
   ),
 });
 
-export default function NoteForm({ cancel }: NoteForm) {
+export default function NoteForm({ cancel }: NoteFormProps) {
   const fieldId = useId();
 
   const queryClient = useQueryClient();
@@ -38,23 +37,12 @@ export default function NoteForm({ cancel }: NoteForm) {
     mutationFn: (newNote: NoteInput) => createNote(newNote),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["note"] });
-    },
-    onError: () => {
       cancel();
     },
+    onError: () => {
+      toast.error("The Note didn`t create.. Try again!");
+    },
   });
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.code === "Escape") cancel();
-    };
-    document.addEventListener("keydown", handleKeyDown);
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "";
-    };
-  }, [cancel]);
 
   const handleCancel = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (e.target === e.currentTarget) cancel();
@@ -66,7 +54,6 @@ export default function NoteForm({ cancel }: NoteForm) {
   ) => {
     mutate(values);
     actions.resetForm();
-    cancel();
   };
 
   return (
@@ -94,7 +81,7 @@ export default function NoteForm({ cancel }: NoteForm) {
               as="textarea"
               id={`${fieldId}-content`}
               name="content"
-              rows="8"
+              rows={8}
               className={css.textarea}
             />
             <ErrorMessage
