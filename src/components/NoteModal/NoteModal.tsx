@@ -3,11 +3,11 @@ import { useEffect } from "react";
 import css from "./NoteModal.module.css";
 import NoteForm from "../NoteForm/NoteForm";
 
-interface NodeModalProps {
+interface NoteModalProps {
   onClose: () => void;
 }
 
-export default function NodeModal({ onClose }: NodeModalProps) {
+export default function NoteModal({ onClose }: NoteModalProps) {
   const handleBackDropClose = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) onClose();
   };

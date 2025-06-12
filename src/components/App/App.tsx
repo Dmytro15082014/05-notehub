@@ -27,12 +27,7 @@ export default function App() {
         id: "fetch-error",
       });
     }
-    if (data?.notes.length === 0) {
-      toast.error(`Search not found`, {
-        id: "fetch-error",
-      });
-    }
-  }, [data?.notes.length, isError, error]);
+  }, [isError, error]);
 
   const handleSearch = (newSearch: string) => {
     setSearch(newSearch);
@@ -54,9 +49,15 @@ export default function App() {
       <div className={css.app}>
         <header className={css.toolbar}>
           <SearchBox onSearch={handleSearch} value={search} />
+          {isSuccess && data.notes.length === 0 && (
+            <>
+              <span> No Match found</span>
+            </>
+          )}
           {isSuccess && totalPages > 1 && (
             <Pagination totalPages={totalPages} page={page} onPage={setPage} />
           )}
+
           <button className={css.button} onClick={openForm}>
             Create note +
           </button>

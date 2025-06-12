@@ -17,7 +17,7 @@ const initValues: NoteInput = {
   tag: "Todo",
 };
 
-const SchemaNoteOrder = Yup.object().shape({
+const NoteSchema = Yup.object().shape({
   title: Yup.string()
     .min(3, "Title must be at least 3 characters")
     .max(50, "Title is too long")
@@ -44,8 +44,8 @@ export default function NoteForm({ cancel }: NoteFormProps) {
     },
   });
 
-  const handleCancel = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (e.target === e.currentTarget) cancel();
+  const handleCancel = () => {
+    cancel();
   };
 
   const noteFormSubmit = (
@@ -61,7 +61,7 @@ export default function NoteForm({ cancel }: NoteFormProps) {
       <Formik
         initialValues={initValues}
         onSubmit={noteFormSubmit}
-        validationSchema={SchemaNoteOrder}
+        validationSchema={NoteSchema}
       >
         <Form className={css.form}>
           <div className={css.formGroup}>
@@ -116,7 +116,11 @@ export default function NoteForm({ cancel }: NoteFormProps) {
             >
               Cancel
             </button>
-            <button type="submit" className={css.submitButton} disabled={false}>
+            <button
+              type="submit"
+              className={css.submitButton}
+              disabled={isPending}
+            >
               {isPending ? "Creating new note..." : "Create note"}
             </button>
           </div>
